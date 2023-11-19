@@ -1,5 +1,4 @@
 import "CoreLibs/object"
-import "position"
 
 class("Scene").extends()
 
@@ -7,19 +6,29 @@ function Scene:init(objects)
     Scene.super.init(self)
 
     self.objects = objects or {}
+
+    self.onChangeScene = nil
+    self.onSceneDestroy = nil
 end
 
-function Scene:update()
+function Scene:onChangeScene(callback)
+    if callback then
+        self.onChangeScene = callback
+    end
+end
+
+function Scene:onSceneDestroy(callback)
+    if callback then
+        self.onSceneDestroy = callback
+    end
+end
+
+function Scene:update(sceneManager)
     for _, item in pairs(self.objects) do
         local collision = self:collidesWith(item)
 
-        result = item:update({ collision })
-        if result == false then
-            return false
-        end
+        item:update(sceneManager, collision)
     end
-
-    return true
 end
 
 function Scene:collidesWith(obj)

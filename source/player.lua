@@ -1,21 +1,23 @@
 import "CoreLibs/object"
 import "CoreLibs/graphics"
 import "config"
+import "position"
 
-class("Player").extends()
+
+class("Player").extends(Position)
 
 local gfx <const> = playdate.graphics
+local startingX <const> = 12
+local startingY <const> = ScreenCenter.y
 local width <const> = 8
 local height <const> = 40
 
 function Player:init(sprite)
-    Player.super.init(self)
-
-    self.pos = { x = 12, y = ScreenCenter.y }
+    Player.super.init(self, startingX, startingY, width, height)
     self.speed = { x = 2, y = 1.6 }
 end
 
-function Player:update() 
+function Player:update(payload) 
     local change, _ = playdate.getCrankChange()
     
     self.pos.y = self.pos.y - ((change * self.speed.y))

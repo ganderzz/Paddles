@@ -1,5 +1,7 @@
 # Paddles
 
+![](titlescreen.png)
+
 Breakout-like game for the [Playdate](https://play.date/).
 
 ## Running

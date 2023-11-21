@@ -11,6 +11,10 @@ function MenuScene:init()
     gfx.clear()
     gfx.setBackgroundColor(gfx.kColorBlack)
 
+    if playdate.isCrankDocked() then
+        playdate.ui.crankIndicator:start()
+    end
+
     sound:setVolume(0)
     sound:play()
     -- Fade in sound

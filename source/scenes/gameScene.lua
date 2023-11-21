@@ -3,11 +3,15 @@ import "CoreLibs/timer"
 import "entities/player"
 import "entities/ball"
 
+import "utils/graphics"
+
 local gfx <const> = playdate.graphics
 local timer <const> = playdate.timer
 
 local sound <const> = playdate.sound.fileplayer.new("sounds/game")
-local font = gfx.font.new('fonts/Inter/Inter')
+local timerTickSound <const> = playdate.sound.fileplayer.new("sounds/timerTick")
+local timerEndSound <const> = playdate.sound.fileplayer.new("sounds/timerEnd")
+
 
 class("GameScene").extends(gfx.sprite)
 
@@ -17,48 +21,42 @@ function GameScene:init()
     gfx.clear()
     gfx.setBackgroundColor(gfx.kColorBlack)
 
-    sound:setVolume(0)
-    sound:play()
-    -- Fade in sound
-    sound:setVolume(1, 1, 5)
-
-    self.count = 3
-
-    gfx.setFont(font)
-    local textImage = gfx.image.new(300, 100)
-    gfx.pushContext(textImage)
-    gfx.setColor(gfx.kColorWhite)
-    gfx.setImageDrawMode(playdate.graphics.kDrawModeInverted)
-    gfx.drawText("" .. self.count, 0, 0)
-    gfx.setImageDrawMode(playdate.graphics.kDrawModeCopy)
-    gfx.popContext()
-
-    local sprite = gfx.sprite.new(textImage)
-    sprite:setImage(textImage)
-    sprite:setZIndex(500)
-    sprite:moveTo(ScreenCenter.x + 150, ScreenCenter.y)
-    sprite:add()
-
-    self.countDownTimer = timer.new(3000, 3, 0, playdate.easingFunctions.linear)
-    self.countDownTimer.updateCallback = function(timer)
-        self:handleCountDown(timer.value)
-    end
-
     self.player = Player()
     self.ball = Ball()
     self:add()
 end
 
+function GameScene:isLoaded()
+    self.countDownTimer = timer.performAfterDelay(0, function()
+        self:handleCountDown(3)
+    end)
+end
+
 function GameScene:handleCountDown(value)
-    self.count = self.count - 1
-    print(value)
-    if self.count >= 1 then
-        --timer.new(3000, function() self:handleCountDown() end)
+    if self.countDownText then
+        self.countDownText:remove()
+    end
+
+    if value >= 1 then
+        self.countDownText = drawText("" .. value, 200)
+        self.countDownText:setZIndex(500)
+        self.countDownText:moveTo(ScreenCenter.x + 182, ScreenCenter.y + 20)
+        self.countDownText:add()
+        timerTickSound:play(1)
+
+        timer.performAfterDelay(1000, function()
+            self:handleCountDown(value - 1)
+        end)
     else
         IS_GAME_ACTIVE = true
+        timerEndSound:play(1)
+        sound:setVolume(0)
+        sound:play()
+        -- Fade in sound
+        sound:setVolume(1, 1, 0.5)
     end
 end
 
--- GameScene:onSceneDestroy(function()
---     sound:setVolume(0, 0, 1)
--- end)
+function GameScene:remove()
+    sound:setVolume(0, 0, 1)
+end

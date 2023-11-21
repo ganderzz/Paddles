@@ -14,7 +14,7 @@ function MenuScene:init()
     sound:setVolume(0)
     sound:play()
     -- Fade in sound
-    sound:setVolume(1, 1, 5)
+    sound:setVolume(1, 1, 3)
 
     local bg = gfx.sprite.new(gfx.image.new("images/title.png"))
     bg:setScale(0.25)
@@ -22,11 +22,19 @@ function MenuScene:init()
     bg:setZIndex(1)
     bg:add()
 
-    local continue = gfx.sprite.new(gfx.image.new("images/continue.png"))
-    continue:setScale(0.8)
-    continue:moveTo(ScreenCenter.x, ScreenCenter.y * 2 - 20)
-    continue:setZIndex(2)
-    continue:add()
+    -- Setup continue button
+    self.continueButton = gfx.sprite.new(gfx.image.new("images/continue.png"))
+    self.continueButton:setScale(0.8)
+    self.continueButton:moveTo(ScreenCenter.x, ScreenCenter.y * 2 - 20)
+    self.continueButton:setZIndex(2)
+    self.continueButton:add()
+
+    self.timer = playdate.timer.new(3000, 0.79, 0.75, playdate.easingFunctions.inOutQuad)
+    self.timer.repeats = true
+    self.timer.reverses = true
+    self.timer.updateCallback = function(timer)
+        self.continueButton:setScale(timer.value)
+    end
 
     self:add()
 end
@@ -34,7 +42,7 @@ end
 function MenuScene:update()
     if playdate.buttonJustPressed(playdate.kButtonA) then
         clickSound:play(1)
-        sound:setVolume(0, 0, 3)
+        sound:setVolume(0, 0, 0.5)
         SceneManager:changeScene("GAME")
     end
 end

@@ -25,6 +25,10 @@ function Ball:init(directionX, directionY)
 end
 
 function Ball:update()
+    if not IS_GAME_ACTIVE then
+        return
+    end
+
     local collisions = self:overlappingSprites()
     if #collisions > 0 then
         self.speed.x = -self.speed.x

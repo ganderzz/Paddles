@@ -30,6 +30,9 @@ function Player:init()
 end
 
 function Player:update()
+    if not IS_GAME_ACTIVE then
+        return
+    end
     local change, _ = playdate.getCrankChange()
 
     self.y = self.y - change * self.speed.y

@@ -1,20 +1,32 @@
 import "CoreLibs/object"
 import "CoreLibs/graphics"
 import "config"
-import "position"
+import "gameObject"
 
-class("Ball").extends(Position)
+class("Ball").extends(GameObject)
 
 local gfx <const> = playdate.graphics
 local radius <const> = 6
 
-function Ball:init(sprite)
+function Ball:init(directionX, directionY)
     Ball.super.init(self, ScreenCenter.x, ScreenCenter.y, radius)
-    self.speed = { x = 3, y = 2 } -- { x = math.random(-3, 3), y = math.random(1, 3) }
+    self.speed = { x = directionX or 3, y = directionY or 2 }
+
+    local circleImage = gfx.image.new(radius * 2, radius * 2)
+    gfx.pushContext(circleImage)
+    gfx.setColor(gfx.kColorWhite)
+    gfx.fillCircleAtPoint(radius, radius, radius)
+    gfx.popContext()
+
+    self:setImage(circleImage)
+    self:setCollideRect(0, 0, self:getSize())
+    self:moveTo(ScreenCenter.x, ScreenCenter.y)
+    self:add()
 end
 
-function Ball:update(sceneManager, collision) 
-    if collision then
+function Ball:update()
+    local collisions = self:overlappingSprites()
+    if #collisions > 0 then
         self.speed.x = -self.speed.x
     end
 
@@ -24,17 +36,16 @@ function Ball:update(sceneManager, collision)
         self.speed.x = -self.speed.x
     end
 
-    self.pos.x = self.pos.x + self.speed.x
-    self.pos.y = self.pos.y + self.speed.y
+    self.x = self.x + self.speed.x
+    self.y = self.y + self.speed.y
 
-    gfx.setColor(gfx.kColorWhite)
-    gfx.fillCircleAtPoint(self.pos.x, self.pos.y, self.width)
+    self:moveTo(self.x, self.y)
 end
 
 function Ball:collidesYScreen()
-    return self.pos.y > ScreenHeight - radius or self.pos.y < radius
+    return self.y > ScreenHeight - radius or self.y < radius
 end
 
 function Ball:collidesXScreen()
-    return self.pos.x > ScreenWidth - radius or self.pos.x < radius
+    return self.x > ScreenWidth - radius or self.x < radius
 end

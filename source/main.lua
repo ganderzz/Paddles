@@ -10,16 +10,16 @@ import "scenes/menuScene"
 import "scenes/gameScene"
 
 import "sceneManager"
-import "scene"
 
 local gfx <const> = playdate.graphics
 
 playdate.display.setRefreshRate(50)
 
 local menuScene = MenuScene
-local sceneManager = SceneManager({ 
-    MENU = menuScene, 
-    GAME = GameScene
+local gameScene = GameScene
+SceneManager = SceneManager({
+    MENU = menuScene,
+    GAME = gameScene,
 }, menuScene)
 local sound = nil
 
@@ -30,19 +30,9 @@ local sound = nil
     end
 
     math.randomseed(playdate.getSecondsSinceEpoch())
-    -- Game setup
-    gfx.setBackgroundColor(gfx.kColorBlack)
 end)()
 
 function playdate.update()
-    gfx.clear()
-
-    sceneManager:update()
-
-    if playdate.isCrankDocked() then
-        playdate.ui.crankIndicator:update()
-    end
-
-    gfx.sprite.update()
     playdate.timer.updateTimers()
+    gfx.sprite.update()
 end

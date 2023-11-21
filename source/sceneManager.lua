@@ -1,5 +1,7 @@
 import "CoreLibs/object"
 
+local gfx <const> = playdate.graphics
+
 class("SceneManager").extends()
 
 function SceneManager:init(scenes, initialScene)
@@ -7,29 +9,31 @@ function SceneManager:init(scenes, initialScene)
 
     self.scenes = scenes or {}
     self.currentScene = initialScene or nil
+    self.isTransitioning = false
 
     if self.currentScene then
-        -- If we have an initialScene we want to call 
-        -- it's "onSceneCreation" method.
-        self.currentScene:onChangeScene()
+        self.currentScene()
     end
 end
 
-function SceneManager:changeScene(id)
-    if not self.scenes[id] then
-        print("There is no scene with the id `" .. id .. "`.")
+function SceneManager:changeScene(id, ...)
+    if self.isTransitioning then
         return
     end
 
-    self.currentScene:onSceneDestroy()
-    self.currentScene = self.scenes[id]
-    self.currentScene:onChangeScene()
+    self.isTransitioning = true
+
+    self:cleanup()
+    self.currentScene = self.scenes[id]()
+    self.isTransitioning = false
 end
 
-function SceneManager:update()
-    if self.currentScene then
-        local result = self.currentScene:update(self)
-    else
-        print("There is no `currentScene` provided to the SceneManager.")
+function SceneManager:cleanup()
+    gfx.sprite.removeAll()
+    gfx.setDrawOffset(0, 0)
+
+    local allTimers = playdate.timer.allTimers()
+    for _, timer in ipairs(allTimers) do
+        timer:remove()
     end
 end

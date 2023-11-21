@@ -1,33 +1,44 @@
 import "CoreLibs/object"
 import "CoreLibs/graphics"
 import "config"
-import "position"
-
-
-class("Player").extends(Position)
+import "gameObject"
 
 local gfx <const> = playdate.graphics
-local startingX <const> = 12
+
+local startingX <const> = 20
 local startingY <const> = ScreenCenter.y
 local width <const> = 8
 local height <const> = 40
 
-function Player:init(sprite)
+class("Player", { x = startingX, y = startingY }).extends(GameObject)
+
+function Player:init()
     Player.super.init(self, startingX, startingY, width, height)
+
     self.speed = { x = 2, y = 1.6 }
+
+    self.sprite = gfx.image.new(width, height)
+    gfx.pushContext(self.sprite)
+    gfx.setColor(gfx.kColorWhite)
+    gfx.fillRoundRect(0, 0, self.width, self.height, 3)
+    gfx.popContext()
+
+    self:setImage(self.sprite)
+    self:setCollideRect(0, 0, self:getSize())
+    self:moveTo(startingX, startingY)
+    self:add()
 end
 
-function Player:update() 
+function Player:update()
     local change, _ = playdate.getCrankChange()
-    
-    self.pos.y = self.pos.y - ((change * self.speed.y))
 
-    if self.pos.y > ScreenHeight + height then
-        self.pos.y = -height
-    elseif self.pos.y < -height then
-        self.pos.y = ScreenHeight + height
+    self.y = self.y - change * self.speed.y
+
+    if self.y > ScreenHeight + height then
+        self.y = -height
+    elseif self.y < -height then
+        self.y = ScreenHeight + height
     end
 
-    gfx.setColor(gfx.kColorWhite)
-    gfx.fillRoundRect(self.pos.x, self.pos.y, width, height, 3)
+    self:moveTo(self.x, self.y)
 end

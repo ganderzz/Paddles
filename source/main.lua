@@ -16,8 +16,6 @@ playdate.display.setRefreshRate(50)
 
 SceneManager = SceneManager(MenuScene)
 
-local sound = nil
-
 GLOBAL_DATA = {
     bricksDestroyed = 0,
 }
@@ -65,9 +63,6 @@ end
 
     math.randomseed(playdate.getSecondsSinceEpoch())
 end)()
-
-
-IS_GAME_ACTIVE = false
 
 function playdate.update()
     playdate.timer.updateTimers()

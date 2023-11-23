@@ -1,4 +1,3 @@
-import "scene"
 import "scenes/levelOneScene"
 
 local gfx <const> = playdate.graphics

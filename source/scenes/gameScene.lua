@@ -1,6 +1,7 @@
 import "CoreLibs/timer"
 
 import "utils/graphics"
+import "config"
 
 local gfx <const> = playdate.graphics
 local timer <const> = playdate.timer
@@ -15,6 +16,20 @@ class("GameScene").extends(gfx.sprite)
 function GameScene:init()
     gfx.clear()
     gfx.setBackgroundColor(gfx.kColorBlack)
+end
+
+function GameScene:drawHud()
+    local image = gfx.image.new(480, 40)
+    gfx.pushContext(image)
+    gfx.setColor(gfx.kColorWhite)
+    gfx.fillRect(0, 0, 480, 40)
+    gfx.setColor(gfx.kColorBlack)
+    gfx.drawTextAligned("Test", 0, 0, kTextAlignment.center)
+    gfx.popContext()
+
+    local sprite = gfx.sprite.new(image)
+
+    sprite:add()
 end
 
 function GameScene:update()

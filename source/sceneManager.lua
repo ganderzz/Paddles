@@ -5,6 +5,8 @@ local timer <const> = playdate.timer
 
 class("SceneManager").extends()
 
+IS_GAME_ACTIVE = false
+
 function SceneManager:init(initialScene)
     SceneManager.super.init(self)
 
@@ -22,6 +24,7 @@ function SceneManager:changeScene(scene, ...)
     end
 
     self.isTransitioning = true
+    IS_GAME_ACTIVE = false
 
     self:startTransition(scene)
     self.isTransitioning = false

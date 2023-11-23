@@ -2,15 +2,17 @@ import "CoreLibs/object"
 import "CoreLibs/graphics"
 import "config"
 import "gameObject"
+import "utils/collisions"
 
 class("Ball").extends(GameObject)
 
 local gfx <const> = playdate.graphics
 local radius <const> = 6
 
-function Ball:init(directionX, directionY)
+function Ball:init()
     Ball.super.init(self, ScreenCenter.x, ScreenCenter.y, radius)
-    self.speed = { x = directionX or 3, y = directionY or 2 }
+    self.speed = 4
+    self.velocity = { x = self.speed, y = 0 }
 
     local circleImage = gfx.image.new(radius * 2, radius * 2)
     gfx.pushContext(circleImage)
@@ -20,6 +22,7 @@ function Ball:init(directionX, directionY)
 
     self:setImage(circleImage)
     self:setCollideRect(0, 0, self:getSize())
+    self:setTag(CollisionGroup.Ball)
     self:moveTo(ScreenCenter.x, ScreenCenter.y)
     self:add()
 end
@@ -29,21 +32,44 @@ function Ball:update()
         return
     end
 
-    local collisions = self:overlappingSprites()
-    if #collisions > 0 then
-        self.speed.x = -self.speed.x
-    end
-
     if self:collidesYScreen() then
-        self.speed.y = -self.speed.y
+        self.velocity.y = -self.velocity.y
     elseif self:collidesXScreen() then
-        self.speed.x = -self.speed.x
+        self.velocity.x = -self.velocity.x
     end
 
-    self.x = self.x + self.speed.x
-    self.y = self.y + self.speed.y
+    self.x = self.x + self.velocity.x
+    self.y = self.y + self.velocity.y
 
-    self:moveTo(self.x, self.y)
+    local _, _, collisions, numberOfCollisions = self:moveWithCollisions(self.x, self.y)
+
+    for i=1, numberOfCollisions do
+        local collision = collisions[i]
+
+        local coords = collision.touch
+        local other = collision.other
+        local collisionTag = other:getTag()
+
+        if collisionTag == CollisionGroup.Player then
+            local intersection = other.y - coords.y
+            local normalizeY = intersection / (other.height / 2)
+            local bounceAngle = normalizeY * (math.pi / 10)
+
+            self.velocity.x = math.cos(bounceAngle) * self.speed
+            self.velocity.y = math.sin(bounceAngle) * self.speed
+        end
+
+        if collisionTag == CollisionGroup.Block then
+            other:hit()
+
+            if collision.normal.x ~= 0 then
+                self.velocity.x = -self.velocity.x
+            end
+            if collision.normal.y ~= 0 then
+                self.velocity.y = -self.velocity.y
+            end
+        end
+    end
 end
 
 function Ball:collidesYScreen()

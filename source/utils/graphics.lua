@@ -13,6 +13,12 @@ function drawText(text, width, height)
     gfx.setImageDrawMode(playdate.graphics.kDrawModeCopy)
     gfx.popContext()
 
+    return textImage
+end
+
+function drawTextSprite(text, width, height)
+    local textImage = drawText(text, width, height)
+
     local sprite = gfx.sprite.new(textImage)
     sprite:setScale(2)
     sprite:setImage(textImage)

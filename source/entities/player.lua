@@ -2,10 +2,11 @@ import "CoreLibs/object"
 import "CoreLibs/graphics"
 import "config"
 import "gameObject"
+import "utils/collisions"
 
 local gfx <const> = playdate.graphics
 
-local startingX <const> = 20
+local startingX <const> = 30
 local startingY <const> = ScreenCenter.y
 local width <const> = 8
 local height <const> = 40
@@ -25,6 +26,7 @@ function Player:init()
 
     self:setImage(self.sprite)
     self:setCollideRect(0, 0, self:getSize())
+    self:setTag(CollisionGroup.Player)
     self:moveTo(startingX, startingY)
     self:add()
 end

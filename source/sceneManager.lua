@@ -5,10 +5,9 @@ local timer <const> = playdate.timer
 
 class("SceneManager").extends()
 
-function SceneManager:init(scenes, initialScene)
+function SceneManager:init(initialScene)
     SceneManager.super.init(self)
 
-    self.scenes = scenes or {}
     self.currentScene = initialScene or nil
     self.isTransitioning = false
 
@@ -17,20 +16,20 @@ function SceneManager:init(scenes, initialScene)
     end
 end
 
-function SceneManager:changeScene(id, ...)
+function SceneManager:changeScene(scene, ...)
     if self.isTransitioning then
         return
     end
 
     self.isTransitioning = true
 
-    self:startTransition(id)
+    self:startTransition(scene)
     self.isTransitioning = false
 end
 
-function SceneManager:loadScene(id)
+function SceneManager:loadScene(scene)
     self:cleanup()
-    self.currentScene = self.scenes[id]()
+    self.currentScene = scene()
 end
 
 function SceneManager:cleanup()
@@ -43,11 +42,11 @@ function SceneManager:cleanup()
     end
 end
 
-function SceneManager:startTransition(id)
+function SceneManager:startTransition(scene)
     local transitionTimer = self:wipeTransition(0, 400)
 
     transitionTimer.timerEndedCallback = function()
-        self:loadScene(id)
+        self:loadScene(scene)
         transitionTimer = self:wipeTransition(400, 0)
         transitionTimer.timerEndedCallback = function()
             self.transitioning = false

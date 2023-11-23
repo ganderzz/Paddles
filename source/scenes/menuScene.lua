@@ -1,4 +1,5 @@
 import "scene"
+import "scenes/levelOneScene"
 
 local gfx <const> = playdate.graphics
 
@@ -47,6 +48,6 @@ function MenuScene:update()
     if playdate.buttonJustPressed(playdate.kButtonA) then
         clickSound:play(1)
         sound:setVolume(0, 0, 0.5)
-        SceneManager:changeScene("GAME")
+        SceneManager:changeScene(LevelOne)
     end
 end

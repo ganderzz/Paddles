@@ -1,8 +1,5 @@
 import "CoreLibs/timer"
 
-import "entities/player"
-import "entities/ball"
-
 import "utils/graphics"
 
 local gfx <const> = playdate.graphics
@@ -15,15 +12,26 @@ local timerEndSound <const> = playdate.sound.fileplayer.new("sounds/timerEnd")
 
 class("GameScene").extends(gfx.sprite)
 
-IS_GAME_ACTIVE = false
-
 function GameScene:init()
     gfx.clear()
     gfx.setBackgroundColor(gfx.kColorBlack)
+end
 
-    self.player = Player()
-    self.ball = Ball()
-    self:add()
+function GameScene:update()
+    local blocksRemaining = #self.blocks
+    if blocksRemaining == 0 then
+        IS_GAME_ACTIVE = false
+        self:levelComplete()
+    end
+end
+
+function GameScene:removeBlock(id)
+    for i = 1, #self.blocks do
+        if self.blocks[i].id == id then
+            table.remove(self.blocks, i)
+            break
+        end
+    end
 end
 
 function GameScene:isLoaded()
@@ -38,7 +46,7 @@ function GameScene:handleCountDown(value)
     end
 
     if value >= 1 then
-        self.countDownText = drawText("" .. value, 200)
+        self.countDownText = drawTextSprite("" .. value, 200)
         self.countDownText:setZIndex(500)
         self.countDownText:moveTo(ScreenCenter.x + 182, ScreenCenter.y + 20)
         self.countDownText:add()

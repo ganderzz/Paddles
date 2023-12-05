@@ -1,31 +1,24 @@
-import "scenes/levelOneScene"
+import "scenes/menuScene"
 
-local STARTING_LEVEL <const> = LevelOne
 local gfx <const> = playdate.graphics
 
 local sound <const> = playdate.sound.fileplayer.new("sounds/title")
 local clickSound <const> = playdate.sound.fileplayer.new("sounds/click")
 
-class("MenuScene").extends(gfx.sprite)
+class("GameOverScene").extends(gfx.sprite)
 
-function MenuScene:init()
+function GameOverScene:init()
     gfx.clear()
     gfx.setBackgroundColor(gfx.kColorBlack)
-
-    if playdate.isCrankDocked() then
-        playdate.ui.crankIndicator:start()
-    end
 
     sound:setVolume(0)
     sound:play()
     -- Fade in sound
     sound:setVolume(1, 1, 3)
 
-    local bg = gfx.sprite.new(gfx.image.new("images/title.png"))
-    bg:setScale(0.25)
-    bg:moveTo(ScreenCenter.x, ScreenCenter.y)
-    bg:setZIndex(1)
-    bg:add()
+    local text = drawTextSprite("Game Over", 300, 100)
+    text:moveTo(350, 150)
+    text:add()
 
     -- Setup continue button
     self.continueButton = gfx.sprite.new(gfx.image.new("images/continue.png"))
@@ -44,10 +37,10 @@ function MenuScene:init()
     self:add()
 end
 
-function MenuScene:update()
+function GameOverScene:update()
     if playdate.buttonJustPressed(playdate.kButtonA) then
         clickSound:play(1)
         sound:setVolume(0, 0, 0.5)
-        SceneManager:changeScene(STARTING_LEVEL)
+        SceneManager:changeScene(MenuScene)
     end
 end

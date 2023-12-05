@@ -3,6 +3,7 @@ import "entities/ball"
 import "entities/block"
 
 import "scenes/gameScene"
+import "scenes/levelThreeScene"
 
 class("LevelTwo").extends(GameScene)
 
@@ -12,14 +13,14 @@ function LevelTwo:init()
     self.player = Player()
     self.ball = Ball()
     self.blocks = {
-        Block(340, 30), Block(340, 95), Block(340, 145), Block(340, 210),
-        Block(310, 70), Block(310, 120), Block(310, 170),
-        Block(290, 90), Block(290, 140),
-        Block(270, 110),
+        Block(380, 30), Block(380, 95), Block(380, 145), Block(380, 210),
+        Block(350, 70), Block(350, 120), Block(350, 170),
+        Block(320, 90), Block(320, 140),
+        Block(290, 110),
     }
     self:add()
 end
 
 function LevelTwo:levelComplete()
-    SceneManager:changeScene()
+    SceneManager:changeScene(LevelThree)
 end

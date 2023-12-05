@@ -20,8 +20,8 @@ function drawText(text, width, height, invert)
     return textImage
 end
 
-function drawTextSprite(text, width, height)
-    local textImage = drawText(text, width, height)
+function drawTextSprite(text, width, height, invert)
+    local textImage = drawText(text, width, height, invert)
 
     local sprite = gfx.sprite.new(textImage)
     sprite:setScale(2)

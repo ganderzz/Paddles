@@ -9,6 +9,7 @@ import "CoreLibs/ui"
 import "scenes/menuScene"
 
 import "sceneManager"
+import "config"
 
 local gfx <const> = playdate.graphics
 

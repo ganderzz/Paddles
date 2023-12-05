@@ -1,7 +1,7 @@
 import "CoreLibs/timer"
 
 import "utils/graphics"
-import "config"
+import "scenes/gameOverScene"
 
 local gfx <const> = playdate.graphics
 local timer <const> = playdate.timer
@@ -16,20 +16,25 @@ class("GameScene").extends(gfx.sprite)
 function GameScene:init()
     gfx.clear()
     gfx.setBackgroundColor(gfx.kColorBlack)
+    self.hitpoints = 3
+
+    self:drawHud()
 end
 
 function GameScene:drawHud()
-    local image = gfx.image.new(480, 40)
-    gfx.pushContext(image)
+    local bg = gfx.image.new(100, 30)
+    gfx.pushContext(bg)
     gfx.setColor(gfx.kColorWhite)
-    gfx.fillRect(0, 0, 480, 40)
-    gfx.setColor(gfx.kColorBlack)
-    gfx.drawTextAligned("Test", 0, 0, kTextAlignment.center)
+    gfx.fillRect(0, 30, 500, 1)
     gfx.popContext()
+    local spriteLine = gfx.sprite.new(bg)
+    spriteLine:moveTo(0, 30)
+    spriteLine:add()
 
-    local sprite = gfx.sprite.new(image)
-
-    sprite:add()
+    self.text = drawTextSprite("HP: " .. self.hitpoints, 300, 100)
+    self.text:setScale(0.6)
+    self.text:moveTo(100, 30)
+    self.text:add()
 end
 
 function GameScene:update()
@@ -40,6 +45,18 @@ function GameScene:update()
     end
 end
 
+function GameScene:playerHit()
+    self.hitpoints = self.hitpoints - 1
+
+    self.text:remove()
+    self:drawHud()
+
+    if self.hitpoints <= 0 then
+        IS_GAME_ACTIVE = false
+        self:gameOver()
+    end
+end
+
 function GameScene:removeBlock(id)
     for i = 1, #self.blocks do
         if self.blocks[i].id == id then
@@ -47,6 +64,11 @@ function GameScene:removeBlock(id)
             break
         end
     end
+end
+
+function GameScene:gameOver()
+    sound:setVolume(0, 0, 1)
+    SceneManager:startTransition(GameOverScene)
 end
 
 function GameScene:isLoaded()
@@ -61,7 +83,7 @@ function GameScene:handleCountDown(value)
     end
 
     if value >= 1 then
-        self.countDownText = drawTextSprite("" .. value, 200)
+        self.countDownText = drawTextSprite("" .. value, 200, 100)
         self.countDownText:setZIndex(500)
         self.countDownText:moveTo(ScreenCenter.x + 182, ScreenCenter.y + 20)
         self.countDownText:add()

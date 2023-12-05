@@ -7,12 +7,13 @@ import "utils/collisions"
 class("Ball").extends(GameObject)
 
 local gfx <const> = playdate.graphics
+local vector <const> = playdate.geometry.vector2D
 local radius <const> = 6
 
 function Ball:init()
     Ball.super.init(self, ScreenCenter.x, ScreenCenter.y, radius)
     self.speed = 4
-    self.velocity = { x = self.speed, y = 0 }
+    self.velocity = vector.new(self.speed, 0)
 
     local circleImage = gfx.image.new(radius * 2, radius * 2)
     gfx.pushContext(circleImage)
@@ -33,13 +34,17 @@ function Ball:update()
     end
 
     if self:collidesYScreen() then
-        self.velocity.y = -self.velocity.y
+        self.velocity.dy = -self.velocity.dy
     elseif self:collidesXScreen() then
-        self.velocity.x = -self.velocity.x
+        self.velocity.dx = -self.velocity.dx
+
+        if self:collidesWithPlayerHurtZone() then
+            SceneManager.currentScene:playerHit()
+        end
     end
 
-    self.x = self.x + self.velocity.x
-    self.y = self.y + self.velocity.y
+    self.x = self.x + self.velocity.dx
+    self.y = self.y + self.velocity.dy
 
     local _, _, collisions, numberOfCollisions = self:moveWithCollisions(self.x, self.y)
 
@@ -63,10 +68,10 @@ function Ball:update()
             other:hit()
 
             if collision.normal.x ~= 0 then
-                self.velocity.x = -self.velocity.x
+                self.velocity.dx = -self.velocity.dx
             end
             if collision.normal.y ~= 0 then
-                self.velocity.y = -self.velocity.y
+                self.velocity.dy = -self.velocity.dy
             end
         end
     end
@@ -77,5 +82,9 @@ function Ball:collidesYScreen()
 end
 
 function Ball:collidesXScreen()
-    return self.x > ScreenWidth - radius or self.x < radius
+    return self.x > ScreenWidth - radius or self.x < -radius
+end
+
+function Ball:collidesWithPlayerHurtZone()
+    return self.x < -radius
 end

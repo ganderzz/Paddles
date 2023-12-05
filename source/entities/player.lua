@@ -16,7 +16,7 @@ class("Player", { x = startingX, y = startingY }).extends(GameObject)
 function Player:init()
     Player.super.init(self, startingX, startingY, width, height)
 
-    self.speed = { x = 2, y = 1.6 }
+    self.velocity = playdate.geometry.vector2D.new(2, 1.6)
 
     self.sprite = gfx.image.new(width, height)
     gfx.pushContext(self.sprite)
@@ -37,7 +37,7 @@ function Player:update()
     end
     local change, _ = playdate.getCrankChange()
 
-    self.y = self.y - change * self.speed.y
+    self.y = self.y - change * self.velocity.dy
 
     if self.y > ScreenHeight + height then
         self.y = -height

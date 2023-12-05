@@ -7,10 +7,21 @@ class("SceneManager").extends()
 
 IS_GAME_ACTIVE = false
 
+circles = {}
+for i=1, 601, 1 do
+    local circle = gfx.image.new(i*2, i*2)
+    gfx.pushContext(circle)
+    gfx.setColor(gfx.kColorWhite)
+    gfx.fillCircleAtPoint(i, i, i)
+    gfx.popContext()
+    circles[i] = circle
+end
+
 function SceneManager:init(initialScene)
     SceneManager.super.init(self)
 
     self.currentScene = initialScene or nil
+    self.transitionSprites = {}
     self.isTransitioning = false
 
     if self.currentScene then
@@ -26,13 +37,12 @@ function SceneManager:changeScene(scene, ...)
     self.isTransitioning = true
     IS_GAME_ACTIVE = false
 
-    self:startTransition(scene)
-    self.isTransitioning = false
+    self:startTransition(scene, {...})
 end
 
-function SceneManager:loadScene(scene)
+function SceneManager:loadScene(scene, args)
     self:cleanup()
-    self.currentScene = scene()
+    self.currentScene = scene(table.unpack(args))
 end
 
 function SceneManager:cleanup()
@@ -45,14 +55,14 @@ function SceneManager:cleanup()
     end
 end
 
-function SceneManager:startTransition(scene)
-    local transitionTimer = self:wipeTransition(0, 400)
+function SceneManager:startTransition(scene, args)
+    local transitionTimer = self:fadeInTransition(0, 600)
 
     transitionTimer.timerEndedCallback = function()
-        self:loadScene(scene)
-        transitionTimer = self:wipeTransition(400, 0)
+        self:loadScene(scene, args)
+        transitionTimer = self:fadeInTransition(600, 0)
         transitionTimer.timerEndedCallback = function()
-            self.transitioning = false
+            self.isTransitioning = false
             self.transitionSprite:remove()
 
             if self.currentScene["isLoaded"] then
@@ -62,21 +72,38 @@ function SceneManager:startTransition(scene)
     end
 end
 
-function SceneManager:wipeTransition(startValue, endValue)
+function SceneManager:fadeInTransition(startValue, endValue)
     local transitionSprite = self:createTransitionSprite()
-    transitionSprite:setClipRect(0, 0, startValue, 240)
+    transitionSprite:setImage(self:getCircleImage(startValue))
 
-    local transitionTimer = timer.new(1000, startValue, endValue, playdate.easingFunctions.inOutCubic)
+    local transitionTimer = timer.new(800, startValue, endValue, playdate.easingFunctions.inOutCubic)
     transitionTimer.updateCallback = function(timer)
-        transitionSprite:setClipRect(0, 0, timer.value, 240)
+        transitionSprite:setImage(self:getCircleImage(timer.value))
     end
     return transitionTimer
 end
 
+function SceneManager:getCircleImage(index)
+    local i = math.floor(index)
+    if i <= 0 or i > #circles then
+        return nil
+    end
+    return circles[i]
+end
+
 function SceneManager:createTransitionSprite()
-    local filledRect = gfx.image.new(400, 240, gfx.kColorWhite)
+    local filledRect = gfx.image.new(800, 480, gfx.kColorBlack)
     local transitionSprite = gfx.sprite.new(filledRect)
-    transitionSprite:moveTo(200, 120)
+
+    local x = 200
+    local y = 120
+
+    if self.currentScene ~= nil and self.currentScene.ball ~= nil then
+        x = self.currentScene.ball.x
+        y = self.currentScene.ball.y
+    end
+
+    transitionSprite:moveTo(x, y)
     transitionSprite:setZIndex(10000)
     transitionSprite:setIgnoresDrawOffset(true)
     transitionSprite:add()

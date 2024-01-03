@@ -4,6 +4,8 @@
 
 Breakout-like game for the [Playdate](https://play.date/).
 
+[https://ganderzz.itch.io/paddles](https://ganderzz.itch.io/paddles)
+
 ## Running
 
 - Run `make` to build.

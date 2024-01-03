@@ -64,7 +64,8 @@ function Ball:update()
             self.velocity.y = math.sin(bounceAngle) * self.speed
         end
 
-        if collisionTag == CollisionGroup.Block then
+        if collisionTag == CollisionGroup.Block or 
+           collisionTag == CollisionGroup.Wall then
             other:hit()
 
             if collision.normal.x ~= 0 then

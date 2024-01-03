@@ -68,7 +68,7 @@ end
 
 function GameScene:gameOver()
     sound:setVolume(0, 0, 1)
-    SceneManager:startTransition(GameOverScene)
+    SceneManager:startTransition(GameOverScene, {})
 end
 
 function GameScene:isLoaded()

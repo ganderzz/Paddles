@@ -17,7 +17,7 @@ function GameOverScene:init()
     sound:setVolume(1, 1, 3)
 
     local text = drawTextSprite("Game Over", 300, 100)
-    text:moveTo(350, 150)
+    text:moveTo(360, 150)
     text:add()
 
     -- Setup continue button

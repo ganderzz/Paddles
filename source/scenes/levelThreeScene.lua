@@ -1,6 +1,7 @@
 import "entities/player"
 import "entities/ball"
 import "entities/block"
+import "entities/wall"
 
 import "scenes/gameScene"
 import "scenes/gameOverScene"
@@ -12,12 +13,14 @@ function LevelThree:init()
 
     self.player = Player()
     self.ball = Ball()
+    self.walls = {
+        Wall(340, 30),
+        Wall(340, 210),
+        Wall(270, 120),
+    }
     self.blocks = {
         Block(380, 30), Block(380, 95), Block(380, 145), Block(380, 210),
-        Block(340, 45), Block(340, 95), Block(340, 145), Block(340, 195),
-        Block(300, 30), Block(300, 95), Block(300, 145), Block(300, 210),
-        Block(260, 45), Block(260, 95), Block(260, 145), Block(260, 195),
-        Block(230, 120),
+        Block(300, 45), Block(300, 95), Block(300, 145), Block(300, 195),
     }
     self:add()
 end

@@ -8,13 +8,13 @@ class("SceneManager").extends()
 IS_GAME_ACTIVE = false
 
 circles = {}
-for i=1, 601, 1 do
+for i=2, 400, 20 do
     local circle = gfx.image.new(i*2, i*2)
     gfx.pushContext(circle)
     gfx.setColor(gfx.kColorWhite)
     gfx.fillCircleAtPoint(i, i, i)
     gfx.popContext()
-    circles[i] = circle
+    table.insert(circles, circle)
 end
 
 function SceneManager:init(initialScene)
@@ -56,11 +56,11 @@ function SceneManager:cleanup()
 end
 
 function SceneManager:startTransition(scene, args)
-    local transitionTimer = self:fadeInTransition(0, 600)
+    local transitionTimer = self:fadeInTransition(0, #circles)
 
     transitionTimer.timerEndedCallback = function()
         self:loadScene(scene, args)
-        transitionTimer = self:fadeInTransition(600, 0)
+        transitionTimer = self:fadeInTransition(#circles, 0)
         transitionTimer.timerEndedCallback = function()
             self.isTransitioning = false
             self.transitionSprite:remove()
@@ -74,11 +74,18 @@ end
 
 function SceneManager:fadeInTransition(startValue, endValue)
     local transitionSprite = self:createTransitionSprite()
-    transitionSprite:setImage(self:getCircleImage(startValue))
+    local value = startValue
+    transitionSprite:setImage(self:getCircleImage(value))
 
-    local transitionTimer = timer.new(800, startValue, endValue, playdate.easingFunctions.inOutCubic)
+    local transitionTimer = timer.new(800, startValue, endValue)
     transitionTimer.updateCallback = function(timer)
-        transitionSprite:setImage(self:getCircleImage(timer.value))
+        if value < endValue then
+            value = value + 1
+        elseif value > endValue then
+            value = value - 1
+        end
+
+        transitionSprite:setImage(self:getCircleImage(value))
     end
     return transitionTimer
 end
